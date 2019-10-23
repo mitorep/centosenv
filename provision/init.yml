@@ -1,0 +1,25 @@
+---
+- hosts: all:!localhost
+  connection: local
+  tasks:
+  - name: Add user and set group 
+    user:
+      name: mito
+      comment: Michael
+      group: wheel
+  - name: Set authorized key
+    authorized_key: 
+      user: mito
+      state: present 
+      key: "{{ lookup('file', '/provision/mitoKey.pb') }}"
+  - name: Delete password for mito
+    shell: passwd -d mito
+  - name: Install list of packages for Kerberos
+    yum:
+      name: "{{ packages }}"
+    vars:
+      packages:
+      - krb5-workstation
+      - krb5-devel
+      - krb5-libs
+      - krb5-server
